@@ -284,16 +284,22 @@ class RecipesController extends AppController {
             $results = $this->Recipe->find('all', array(
                 'recursive' => 0,
                 'fields' => array(
-                'id',
-                'name',
-                'COUNT(*) as matches'),
+                    'id',
+                    'name',
+                    'COUNT(*) as matches'),
                 'group' => array('Recipe.id', 'Recipe.name'),
                 'joins' => array(
+                    array(
+                        'alias' => 'IngredientGroup',
+                        'table' => 'ingredient_groups',
+                        'foreignKey' => false,
+                        'conditions' => array('IngredientGroup.recipe_id = Recipe.id'),
+                    ),
                     array(
                         'alias' => 'IngredientMapping',
                         'table' => 'ingredient_mappings',
                         'foreignKey' => false,
-                        'conditions' => array('IngredientMapping.recipe_id = Recipe.id'),
+                        'conditions' => array('IngredientMapping.group_id = IngredientGroup.id'),
                     ),
                 ),
                 'conditions' => array(
