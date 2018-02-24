@@ -154,20 +154,21 @@ if (isset($recipe['Review'])) {
             ?>
             <b><?php echo __('Ingredients'); ?></b>
             <table>
-                <?php for ($i = 0; $i < count($recipe['IngredientMapping']); $i++) :
-                            $quantity = $recipe['IngredientMapping'][$i]['quantity'];
+                <?php $ingredientMapping = $recipe['IngredientGroup'][0]['IngredientMapping'];
+                      for ($i = 0; $i < count($ingredientMapping); $i++) :
+                            $quantity = $ingredientMapping[$i]['quantity'];
                             if ($quantity) {
                                 if (isset($scale)) $quantity *= $scale;
                                 $quantity = $this->Fraction->toFraction($quantity);
-                                $unit = $recipe['IngredientMapping'][$i]['Unit']['abbreviation'];
+                                $unit = $ingredientMapping[$i]['Unit']['abbreviation'];
                             } else {
                                 $quantity = '';
                                 $unit = '';
                             }
-                            $ingredientName = $recipe['IngredientMapping'][$i]['Ingredient']['name'];
-                            $qualifier = $recipe['IngredientMapping'][$i]['qualifier'];
-                            $note = $recipe['IngredientMapping'][$i]['note'];
-                            $optional = $recipe['IngredientMapping'][$i]['optional'] ? __('(optional)') : "";
+                            $ingredientName = $ingredientMapping[$i]['Ingredient']['name'];
+                            $qualifier = $ingredientMapping[$i]['qualifier'];
+                            $note = $ingredientMapping[$i]['note'];
+                            $optional = $ingredientMapping[$i]['optional'] ? __('(optional)') : "";
                 ?>
                 <tr>
                     <td class="ingredientViewUnit"><?php echo "$quantity $unit";?></td>
@@ -233,14 +234,15 @@ if (isset($recipe['Review'])) {
                     <b><?php echo __('Ingredients'); ?></b>
                     
                     <table>
-                    <?php for ($i = 0; $i < count($related['Related']['IngredientMapping']); $i++) :
-                            $quantity = $related['Related']['IngredientMapping'][$i]['quantity'];
+                    <?php $ingredientMapping = $related['Related']['IngredientGroup'][0]['IngredientMapping'];
+                          for ($i = 0; $i < count($ingredientMapping); $i++) :
+                            $quantity = $ingredientMapping[$i]['quantity'];
                             if (isset($scale)) $quantity *= $scale;
                             $quantity = $this->Fraction->toFraction($quantity);
-                            $unit = $related['Related']['IngredientMapping'][$i]['Unit']['abbreviation'];
-                            $ingredientName = $related['Related']['IngredientMapping'][$i]['Ingredient']['name']; 
-                            $qualifier = $related['Related']['IngredientMapping'][$i]['qualifier'];
-                            $optional = $related['Related']['IngredientMapping'][$i]['optional'] ? __('(optional)') : "";
+                            $unit = $ingredientMapping[$i]['Unit']['abbreviation'];
+                            $ingredientName = $ingredientMapping[$i]['Ingredient']['name']; 
+                            $qualifier = $ingredientMapping[$i]['qualifier'];
+                            $optional = $ingredientMapping[$i]['optional'] ? __('(optional)') : "";
                         ?>
                         <tr>
                             <td class="ingredientViewUnit"><?php echo "$quantity $unit";?></td>

@@ -112,13 +112,15 @@ class ShoppingList extends AppModel {
                     'fields' => array('servings'),
                     'Recipe' => array(
                         'fields' => array('name', 'serving_size'),
-                        'IngredientMapping' => array(
-                            'fields' => array('quantity'),
-                            'Unit' => array(
-                                'fields' => array('name')
-                            ),
-                            'Ingredient' => array(
-                                'fields' => array('name', 'location_id')
+                        'IngredientGroup' => array(
+                            'IngredientMapping' => array(
+                                'fields' => array('quantity'),
+                                'Unit' => array(
+                                    'fields' => array('name')
+                                ),
+                                'Ingredient' => array(
+                                    'fields' => array('name', 'location_id')
+                                )
                             )
                         )
                     )
@@ -144,7 +146,7 @@ class ShoppingList extends AppModel {
         foreach ($list['ShoppingListRecipe'] as $recipeInList) {
             $recipeDetail = $recipeInList['Recipe'];
             $scaling = $recipeInList['servings'] / $recipeDetail['serving_size'];
-            foreach ($recipeDetail['IngredientMapping'] as $mapping) {
+            foreach ($recipeDetail['IngredientGroup'][0]['IngredientMapping'] as $mapping) {
                 $ingredients = $this->combineIngredient($ingredients, $mapping, $scaling);
             }
         }

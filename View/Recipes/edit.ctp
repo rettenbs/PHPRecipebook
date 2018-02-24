@@ -28,6 +28,9 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
         $('#AddMoreIngredientsLink').click(function() {
             $('#ingredientsSection .extraItem input').change();
             return false;
+	});
+	$('#AddMoreGroupsLink').click(function() {
+            return false;
         });
         $('#AddMoreRelatedRecipesLink').click(function() {
             $('#relatedRecipesSection .extraItem input').change();
@@ -178,47 +181,47 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
                     var newNodeId = "";
                     
                     if (nodeName.indexOf("Quantity") > -1) {
-                        newNodeId = "IngredientMapping" + i + "Quantity";
-                        newNodeName = "data[IngredientMapping][" + i + "][quantity]";
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "Quantity";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][quantity]";
                     }
                     else if (nodeName.indexOf("UnitId") > -1) { 
-                        newNodeId = "IngredientMapping" + i + "UnitId";
-                        newNodeName = "data[IngredientMapping][" + i + "][unit_id]";
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "UnitId";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][unit_id]";
                     }
                     else if (nodeName.indexOf("Qualifier") > -1) { 
-                        newNodeId = "IngredientMapping" + i + "Qualifier";
-                        newNodeName = "data[IngredientMapping][" + i + "][qualifier]";
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "Qualifier";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][qualifier]";
                     }
                     else if (nodeName.indexOf("Note") > -1) { 
-                        newNodeId = "IngredientMapping" + i + "Note";
-                        newNodeName = "data[IngredientMapping][" + i + "][note]";
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "Note";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][note]";
                     }
                     else if (nodeName.indexOf("IngredientName") > -1) { 
-                        newNodeId = "IngredientMapping" + i + "IngredientName";
-                        newNodeName = "data[IngredientMapping][" + i + "][Ingredient][name]";
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "IngredientName";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][Ingredient][name]";
                     }
                     else if (nodeName.indexOf("RecipeId") > -1) { 
-                        newNodeId = "IngredientMapping" + i + "RecipeId";
-                        newNodeName = "data[IngredientMapping][" + i + "][recipe_id]";
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "RecipeId";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][recipe_id]";
                         var recipeId = $('#RecipeId').val();
                         $(this).val(recipeId);
                     }
                     else if (nodeName.indexOf("IngredientId") > -1) { 
-                        newNodeId = "IngredientMapping" + i + "IngredientId";
-                        newNodeName = "data[IngredientMapping][" + i + "][ingredient_id]";
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "IngredientId";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][ingredient_id]";
                     }
                     else if (nodeName.indexOf("SortOrder") > -1) {
-                        newNodeId = "IngredientMapping" + i + "SortOrder";
-                        newNodeName = "data[IngredientMapping][" + i + "][sort_order]";
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "SortOrder";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][sort_order]";
                         $(this).val(i);
                     }
                     else if (nodeName.indexOf("Optional") > -1) {
-                        newNodeId = "IngredientMapping" + i + "Optional";
-                        newNodeName = "data[IngredientMapping][" + i + "][optional]";  
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "Optional";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][optional]";  
                     }
                     else if (nodeName.indexOf("Id") > -1) { 
-                        newNodeId = "IngredientMapping" + i + "Id";
-                        newNodeName = "data[IngredientMapping][" + i + "][id]";
+                        newNodeId = "IngredientGroup0IngredientMapping" + i + "Id";
+                        newNodeName = "data[IngredientGroup][0][IngredientMapping][" + i + "][id]";
                     }
                     $(this).attr('name', newNodeName);
                     $(this).attr('id', newNodeId);
@@ -400,6 +403,11 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
             echo $this->Form->hidden('user_id');
             ?>
             <div id="ingredientsSection">
+                <?php if (isset($recipe) && isset($recipe['IngredientGroup'][0])) {
+                    echo $this->Form->hidden('IngredientGroup.0.id');
+                    echo $this->Form->hidden('IngredientGroup.0.recipe_id');
+                    echo $this->Form->hidden('IngredientGroup.0.sort_order');
+                } ?>
                 <table id="sortableTable1">
                 <tr class="headerRow">
                     <th class="deleteIcon"></th><th class="moveIcon"></th>
@@ -415,15 +423,16 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
                 </tr>
                 <tbody class="gridContent">
                 <?php 
-                $ingredientCount = (isset($recipe) && isset($recipe['IngredientMapping']))? count($recipe['IngredientMapping']) : 0;
+                $ingredientCount = (isset($recipe) && isset($recipe['IngredientGroup'][0]['IngredientMapping']))? count($recipe['IngredientGroup'][0]['IngredientMapping']) : 0;
                 for ($mapIndex = 0; $mapIndex <= $ingredientCount; $mapIndex++) {
                     $currentSortOrder = __("Unknown");
                     $extraItem = true;
                     $itemId = "";
                     if ($mapIndex < $ingredientCount)
                     {
-                        $itemId = $recipe['IngredientMapping'][$mapIndex]['id'];
-                        $currentSortOrder = $recipe['IngredientMapping'][$mapIndex]['sort_order'];
+                        $ingredientMapping = $recipe['IngredientGroup'][0]['IngredientMapping'];
+                        $itemId = $ingredientMapping[$mapIndex]['id'];
+                        $currentSortOrder = $ingredientMapping[$mapIndex]['sort_order'];
                         $extraItem = false;
                     }       
                 ?>
@@ -441,26 +450,27 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
                             <span class="ui-icon ui-icon-arrow-4"></span>
                         </div>
                     </td>
-                    <td>
-                        <?php echo $this->Form->hidden('IngredientMapping.' . $mapIndex . '.id'); ?>
-                        <?php echo $this->Form->hidden('IngredientMapping.' . $mapIndex . '.recipe_id'); ?>
-                        <?php echo $this->Form->hidden('IngredientMapping.' . $mapIndex . '.ingredient_id'); ?>
-                        <?php echo $this->Form->hidden('IngredientMapping.' . $mapIndex . '.sort_order'); ?>
+		    <td>
+                        <?php echo $this->Form->hidden('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.id'); ?>
+                        <?php echo $this->Form->hidden('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.recipe_id'); ?>
+                        <?php echo $this->Form->hidden('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.ingredient_id'); ?>
+                        <?php echo $this->Form->hidden('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.sort_order'); ?>
                         
-                        <?php echo $this->Form->input('IngredientMapping.' . $mapIndex . '.quantity', array('label' => false, 'type' => 'fraction')); ?></td>
-                    <td><?php echo $this->Form->input('IngredientMapping.' . $mapIndex . '.unit_id', array('label' => false)); ?></td>
-                    <td><?php echo $this->Form->input('IngredientMapping.' . $mapIndex . '.qualifier', array('label' => false, 'escape' => false)); ?></td>
+                        <?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.quantity', array('label' => false, 'type' => 'fraction')); ?></td>
+                    <td><?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.unit_id', array('label' => false)); ?></td>
+                    <td><?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.qualifier', array('label' => false, 'escape' => false)); ?></td>
                     <td>
-                        <?php echo $this->Form->input('IngredientMapping.' . $mapIndex . '.Ingredient.name', array('label' => false, 'escape' => false, 'type' => 'ui-widget')); ?>
+                        <?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.Ingredient.name', array('label' => false, 'escape' => false, 'type' => 'ui-widget')); ?>
                     </td>
-                    <td><?php echo $this->Form->input('IngredientMapping.' . $mapIndex . '.note', array('label' => false, 'escape' => false)); ?></td>
-                    <td><?php echo $this->Form->input('IngredientMapping.' . $mapIndex . '.optional', array('label' => false)); ?></td> 
+                    <td><?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.note', array('label' => false, 'escape' => false)); ?></td>
+                    <td><?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.optional', array('label' => false)); ?></td> 
                 </tr>
                 <?php } ?>
                 </tbody>
                 </table>
                 <div id="ingredientDeleteResponse"></div>
                 <a href="#" id="AddMoreIngredientsLink"><?php echo __('Add Another Ingredient');?></a>
+                <a href="#" id="AddMoreGroupsLink"><?php echo __('Add Another Group');?></a>
             </div>
             <?php 
             echo $this->Form->input('directions', array('escape' => true, 'rows' => '20', 'cols' => '20'));

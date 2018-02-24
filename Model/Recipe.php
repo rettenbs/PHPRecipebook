@@ -116,10 +116,10 @@ class Recipe extends AppModel {
             'order' => 'RelatedRecipe.sort_order',
             'dependent' => true
         ),
-        'IngredientMapping' => array(
-            'className' => 'IngredientMapping',
+        'IngredientGroup' => array(
+            'className' => 'IngredientGroup',
             'foreignKey' => 'recipe_id',
-            'order' => 'IngredientMapping.sort_order',
+            'order' => 'IngredientGroup.sort_order',
             'dependent' => true
         ),
         'Image' => array(
@@ -156,7 +156,7 @@ class Recipe extends AppModel {
         $data['Image'] = $images;
 
         // Try to save the data using Model::saveAll()
-        if ($this->saveAll($data)) {
+        if ($this->saveAll($data, array('deep' => true))) {
             return true;
         }
 

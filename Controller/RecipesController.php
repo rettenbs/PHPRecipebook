@@ -90,24 +90,30 @@ class RecipesController extends AppController {
         $this->Recipe->Behaviors->load('Containable');
         $options = array('conditions' => array('Recipe.' . $this->Recipe->primaryKey => $id), 
                 'contain' => array(
-                    'IngredientMapping' => array(
-                        'Ingredient' => array(
-                            'fields' => array('name')
+		    'IngredientGroup' => array(
+                        'fields' => array('name'),
+                        'IngredientMapping' => array(
+                            'Ingredient' => array(
+                                'fields' => array('name')
+                            ),
+                            'Unit' => array(
+                                'fields' => array('name', 'abbreviation') 
+                            )
                         ),
-                        'Unit' => array(
-                            'fields' => array('name', 'abbreviation') 
-                        )
                     ),
                     'RelatedRecipe' => array(
                         'Related' => array(
                             'fields' => array('id', 'name', 'directions'),
-                            'IngredientMapping' => array(
-                                'Ingredient' => array(
-                                    'fields' => array('name')
-                                ),
-                                'Unit' => array(
-                                    'fields' => array('name', 'abbreviation') 
-                                )
+		            'IngredientGroup' => array(
+                                'fields' => array('name'),
+                                'IngredientMapping' => array(
+                                    'Ingredient' => array(
+                                        'fields' => array('name')
+                                    ),
+                                    'Unit' => array(
+                                        'fields' => array('name', 'abbreviation') 
+                                    )
+				)
                             )
                         )
                     ),
@@ -159,6 +165,9 @@ class RecipesController extends AppController {
             $recipe = $this->request->data;
             //TODO: Keep the original author just in case editor/admin edits
             $recipe['Recipe']['user_id'] = $this->Auth->user('id');
+            // Clear ingredient/related names to avoid creating new ingredients due to 'deep' save
+            $this->clearIngrdientNames($recipe);
+            $this->clearRelatedNames($recipe);
             if ($this->Recipe->saveWithAttachments($recipe)) {
                 $this->Session->setFlash(__('The recipe has been saved.'), "success");
                 return $this->redirect(array('action' => 'index'));
@@ -176,7 +185,7 @@ class RecipesController extends AppController {
         $difficulties = $this->Recipe->Difficulty->find('list');
         $sources = $this->Recipe->Source->find('list', array('order' => array('name')));
         $preparationMethods = $this->Recipe->PreparationMethod->find('list', array('order' => array('name')));
-        $units = $this->Recipe->IngredientMapping->Ingredient->Unit->find('list', array('order' => array('name')));
+        $units = $this->Recipe->IngredientGroup->IngredientMapping->Ingredient->Unit->find('list', array('order' => array('name')));
         $this->set(compact('ethnicities', 'baseTypes', 'courses', 'preparationTimes', 'difficulties', 'sources',  'preparationMethods', 'recipe', 'units'));
     }
     
@@ -184,7 +193,7 @@ class RecipesController extends AppController {
         $this->Recipe->Behaviors->load('Containable');
         $options = array('conditions' => array('Recipe.' . $this->Recipe->primaryKey => $id), 
             'contain' => array(
-                'IngredientMapping.Ingredient.name', 
+                'IngredientGroup.IngredientMapping.Ingredient.name', 
                 'RelatedRecipe.Related.name', 
                 'Image'));
         $this->request->data = $this->Recipe->find('first', $options);
@@ -297,4 +306,19 @@ class RecipesController extends AppController {
         }
     }
 
+    private function clearIngrdientNames(&$data) {
+        foreach ( $data['IngredientGroup'] as $gid => $group ) {
+            foreach ( $group['IngredientMapping'] as $mid => $mapping ) {
+                unset($data['IngredientGroup'][$gid]['IngredientMapping'][$mid]['Ingredient']);
+            }
+        }
+    }
+
+    private function clearRelatedNames(&$data) {
+        if (isset($data['RelatedRecipe'])) {
+            foreach ( $data['RelatedRecipe'] as $id => $related ) {
+                unset($data['RelatedRecipe'][$id]['Related']);
+            }
+        }
+    }
 }
