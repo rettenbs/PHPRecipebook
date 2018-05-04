@@ -170,15 +170,15 @@ function initDialogs() {
 		autoOpen: false,
 		title: $(this).attr("title"),
 		modal: true,
-		width: $(this).attr("width"),
-                height: $(this).attr("height"),
+        width: $(this).attr("width"), height: $(this).attr("height"),
+        position: { my: "center", at: "center", of: "#content"},
 		buttons: { 
                     "Save": function() { 
                         $(this).find(':submit').click(); 
                     },
                     "Close": function() { $(this).dialog('close'); } 
                 }
-	});
+	    });
     });
 }
 

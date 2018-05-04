@@ -90,6 +90,7 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
         initRowCopy('ingredientsSection');
         initRowCopy('relatedRecipesSection');
         initRowDelete();
+        initRowNote();
         initIngredientAutoComplete();
         initRelatedAutoCompleted();
     });
@@ -122,6 +123,28 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
                    initRelatedAutoCompleted();
                }
             });
+        });
+    }
+
+    function initRowNote() {
+        $('.commentIcon').off('click');
+        $('.commentIcon').click(function() {
+           var rowId = $(this).attr('rowId');
+           var oldNote =  $('#IngredientGroup0IngredientMapping' + rowId + 'Note').val();
+           $('#noteText').val(oldNote);
+           //$('#noteText').val(oldNote);
+
+           $('#editNoteDialog').dialog({
+            buttons: { 
+                        "Save": function() { 
+                            var newNote = $('#noteText').val();
+                            $('#IngredientGroup0IngredientMapping' + rowId + 'Note').val(newNote);
+                            $(this).dialog('close');
+                        },
+                        "Close": function() { $(this).dialog('close'); } 
+                    }
+                });
+            $('#editNoteDialog').dialog('open');
         });
     }
     
@@ -410,7 +433,9 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
                 } ?>
                 <table id="sortableTable1">
                 <tr class="headerRow">
-                    <th class="deleteIcon"></th><th class="moveIcon"></th>
+                    <th class="deleteIcon"></th>
+                    <th class="moveIcon"></th>
+                    <th class="commentIcon"></th>
                     <th><?php echo __('Quantity');?></th>
                     <th><?php echo __('Units');?></th>
                     <th><?php echo __('Qualifier');?></th>
@@ -418,7 +443,6 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
                         <?php echo $this->Html->link(__('add new'), array('controller'=>'ingredients', 'action' => 'edit'), 
                                 array('class' => 'ajaxLink', 'targetId' => 'editIngredientDialog', 'id'=>'addNewIngredientsLink'));?>
                     </th>
-                    <th><?php echo __('Note');?></th>
                     <th><?php echo __('Optional');?></th>
                 </tr>
                 <tbody class="gridContent">
@@ -450,24 +474,31 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
                             <span class="ui-icon ui-icon-arrow-4"></span>
                         </div>
                     </td>
+                    <td>
+                        <div class="ui-state-default ui-corner-all commentIcon" 
+                            rowId="<?php echo $mapIndex;?>" 
+                            title="<?php echo __('Add or edit a note' );?>">
+                            <span class="ui-icon ui-icon-comment"></span>
+                        </div>
+                    </td>
 		    <td>
                         <?php echo $this->Form->hidden('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.id'); ?>
                         <?php echo $this->Form->hidden('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.recipe_id'); ?>
                         <?php echo $this->Form->hidden('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.ingredient_id'); ?>
                         <?php echo $this->Form->hidden('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.sort_order'); ?>
+                        <?php echo $this->Form->hidden('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.note'); ?>
                         
                         <?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.quantity', array('label' => false, 'type' => 'fraction')); ?></td>
                     <td><?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.unit_id', array('label' => false)); ?></td>
                     <td><?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.qualifier', array('label' => false, 'escape' => false)); ?></td>
-                    <td>
-                        <?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.Ingredient.name', array('label' => false, 'escape' => false, 'type' => 'ui-widget')); ?>
-                    </td>
-                    <td><?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.note', array('label' => false, 'escape' => false)); ?></td>
+                    <td><?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.Ingredient.name', array('label' => false, 'escape' => false, 'type' => 'ui-widget')); ?></td>
                     <td><?php echo $this->Form->input('IngredientGroup.0.IngredientMapping.' . $mapIndex . '.optional', array('label' => false)); ?></td> 
                 </tr>
+
                 <?php } ?>
                 </tbody>
                 </table>
+
                 <div id="ingredientDeleteResponse"></div>
                 <a href="#" id="AddMoreIngredientsLink"><?php echo __('Add Another Ingredient');?></a>
                 <a href="#" id="AddMoreGroupsLink"><?php echo __('Add Another Group');?></a>
@@ -527,4 +558,10 @@ $recipeId = isset($recipe['Recipe']['id']) ? $recipe['Recipe']['id'] : "";
     </fieldset>
 <?php echo $this->Session->flash(); ?> 
 <?php echo $this->Form->end(__('Submit')); ?>
+</div>
+
+<div id="editNoteDialog" class="dialog" width="300" height="200" title="<?php echo __('Note');?>">
+    <input type="hidden" id="rowId"/>
+    <textarea id="noteText" cols=30 rows=4>
+    </textarea>
 </div>

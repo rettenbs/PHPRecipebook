@@ -170,7 +170,7 @@ class RecipesController extends AppController {
             $this->clearRelatedNames($recipe);
             if ($this->Recipe->saveWithAttachments($recipe)) {
                 $this->Session->setFlash(__('The recipe has been saved.'), "success");
-                return $this->redirect(array('action' => 'index'));
+                return $this->redirect(array('action' => 'view', $this->Recipe->id));
             } else {
                 $this->Session->setFlash(__('The recipe could not be saved. Please, try again.'));
             }
